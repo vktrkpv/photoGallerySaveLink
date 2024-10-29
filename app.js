@@ -14,8 +14,6 @@ gallery.addEventListener('click',detelePhoto);
 function addPhoto(e) {
     e.preventDefault();
 
-    // start creating where to save pics 
-
     const itemsDiv = document.createElement("div");
     itemsDiv.classList.add("itemsDiv");
     itemsDiv.innerHTML = `<img src="${urlInput.value}" alt="${textInput.value}" width="150px">`;
@@ -24,24 +22,16 @@ function addPhoto(e) {
     textDiv.classList.add('textDiv');
     textDiv.innerText = textInput.value;
 
-    saveLocalPhotos(urlInput.value);
-
-    // clear the value
+    saveLocalPhotos(urlInput.value, textInput.value);
 
     urlInput.value = "";
     textInput.value = "";
 
     itemsDiv.appendChild(textDiv);
 
-
-    // create delete button 
-
     const deteleBtn = document.createElement('button');
     deteleBtn.innerHTML = `<i class="fa-solid fa-xmark" style="color: #e32400;"></i>`;
     deteleBtn.classList.add("trash-btn");
-
-
-    // append child to gallery 
 
     itemsDiv.appendChild(deteleBtn);
     gallery.appendChild(itemsDiv);
@@ -50,12 +40,13 @@ function addPhoto(e) {
 
 function detelePhoto(e) {
     const item = e.target.parentNode;
+ 
     removeLocalPhotos();
     item.remove();
 
 }
 
-function saveLocalPhotos(photo) {
+function saveLocalPhotos(url, description) {
 
     let photos;
     if(localStorage.getItem("gallery-container") === null ){
@@ -64,11 +55,11 @@ function saveLocalPhotos(photo) {
         photos = JSON.parse(localStorage.getItem("gallery-container"))
     }
 
-    photos.push(photo);
+    photos.push({ url, description });
     localStorage.setItem('gallery-container', JSON.stringify(photos));
 }
 
-function removeLocalPhotos(photo){
+function removeLocalPhotos(photoUrl){
 
     let photos;
     if(localStorage.getItem("gallery-container") === null ){
@@ -77,9 +68,8 @@ function removeLocalPhotos(photo){
         photos = JSON.parse(localStorage.getItem("gallery-container"))
     }
 
-    // remove the position of the elemen 
-
-    console.log(photo.children[0]);
+    photos = photos.filter(photo => photo.url !== photoUrl);
+    localStorage.setItem("gallery-container", JSON.stringify(photos));
 
 }
 
@@ -93,15 +83,15 @@ function getPhotos() {
         photos = JSON.parse(localStorage.getItem("gallery-container"))
     }
 
-    photos.forEach(function(photo, text){
+    photos.forEach(function(photo){
 
     const itemsDiv = document.createElement("div");
     itemsDiv.classList.add("itemsDiv");
-    itemsDiv.innerHTML = `<img src="${photo}" width="150px">`;
+    itemsDiv.innerHTML = `<img src="${photo.url}" alt="${photo.description}" width="150px">`;
 
     const textDiv = document.createElement("div");
     textDiv.classList.add('textDiv');
-    textDiv.innerText = itemsDiv;
+    textDiv.innerText = photo.description;
 
     itemsDiv.appendChild(textDiv);
 
